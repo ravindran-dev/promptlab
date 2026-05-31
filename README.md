@@ -28,7 +28,7 @@ The primary goal is prompt experimentation, evaluation, benchmarking, and contin
         |                        |                        |
         v                        v                        v
 +---------------+        +---------------+        +---------------+
-|  PostgreSQL   |        |  Redis Cache  |        |  OpenAI LLM   |
+|  PostgreSQL   |        |  Redis Cache  |        |  Gemini LLM   |
 | (Metric Logs) |        | (Leaderboards)|        | (Judge/Gen)   |
 +---------------+        +---------------+        +---------------+
 ```
@@ -36,7 +36,7 @@ The primary goal is prompt experimentation, evaluation, benchmarking, and contin
 ### LangGraph Node Workflow
 1. **Input Node**: Receives user inputs (`problem`, `solution`, `goals`, `template`, `prompt_version`).
 2. **Prompt Loader**: Retrieves active prompt content from Redis Cache, PostgreSQL, or Filesystem fallback.
-3. **PRD Generator**: Runs standard generation using ChatOpenAI (or Mock LLM fallback) and logs latency and token usage.
+3. **PRD Generator**: Runs standard generation using Gemini (or Mock LLM fallback) and logs latency and token usage.
 4. **Evaluator**: Runs an LLM-as-a-Judge evaluation across 8 core metrics.
 5. **Metrics Collector**: Synthesizes and groups the generated text and execution metrics.
 6. **Database Writer**: Stores the compiled `MetricRun` in PostgreSQL.
@@ -59,14 +59,14 @@ The primary goal is prompt experimentation, evaluation, benchmarking, and contin
 
 ### Prerequisites
 - Docker & Docker Compose installed.
-- (Optional) OpenAI API Key set in environment.
+- (Optional) Google Gemini API Key set in environment.
 
 ### 1. Launch with Docker Compose
 To build and spin up the complete microservice architecture:
 
 ```bash
 # Set your API Key (Optional. If not set, system launches in Mock Mode)
-export OPENAI_API_KEY="your-actual-api-key-here"
+export GOOGLE_API_KEY="your-actual-api-key-here"
 
 # Spin up containers
 docker compose up --build
