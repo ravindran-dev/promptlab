@@ -1,0 +1,7 @@
+{
+  "id": "edge_1_offline_sync",
+  "problem": "Mobile app users lose typed inspection logs if they drive through areas with spotty internet connectivity.",
+  "solution": "Build an offline synchronization database queue using IndexedDB that auto-merges local drafts back to the cloud.",
+  "goals": "Queue modifications offline. Retry sync on reconnect. Detect and resolve conflict version collisions gracefully.",
+  "template": "## 1. Local Database Schema\n## 2. Network Check & Retry Logic\n## 3. Conflict Resolution Protocol\n## 4. Fail-safe Storage Limits"
+}

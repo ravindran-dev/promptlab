@@ -1,0 +1,7 @@
+{
+  "id": "large_6_notification_system",
+  "problem": "Users miss important system events because they are not actively watching the application.",
+  "solution": "Build a real-time notification engine feeding in-app notifications, push notifications, and emails.",
+  "goals": "Support real-time WebSockets connection. Group notifications by day. Provide mark-all-as-read buttons. Manage notification frequency preferences.",
+  "template": "## 1. Notification Feed Layout\n## 2. WebSocket Connection Flow\n## 3. DB Queue Design & PubSub\n## 4. Delivery Channel Routing Logic"
+}

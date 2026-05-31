@@ -1,0 +1,7 @@
+{
+  "id": "small_3_profile_upload",
+  "problem": "Profiles look generic and empty because users cannot easily upload custom profile pictures.",
+  "solution": "Create a drag-and-drop avatar image uploader with client-side cropping.",
+  "goals": "Support JPG/PNG up to 2MB. Preview crop area instantly. Save optimized 150x150 file to CDN.",
+  "template": "## 1. Functional Requirements\n## 2. File Validation Rules\n## 3. Error Handling"
+}

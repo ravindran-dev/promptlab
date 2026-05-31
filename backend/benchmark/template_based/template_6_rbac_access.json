@@ -1,0 +1,7 @@
+{
+  "id": "template_6_rbac_access",
+  "problem": "Auditors flag access controls because system permissions are added ad-hoc without formal request records.",
+  "solution": "Establish an Internal Tool Access Control policy matrix template defining role assignments and permission scopes.",
+  "goals": "Map administrative permissions. Define temporary access expiration times. Mandate dual-authorization for superuser actions.",
+  "template": "## 1. Roles Definition Matrix\n## 2. Permission Levels (Read, Write, Admin)\n## 3. Approval Workflows\n## 4. Revocation & Expiry Rules"
+}

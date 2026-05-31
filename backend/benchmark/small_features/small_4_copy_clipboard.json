@@ -1,0 +1,7 @@
+{
+  "id": "small_4_copy_clipboard",
+  "problem": "Users manually highlight and copy referral links, frequently making errors or missing characters.",
+  "solution": "Add a one-click 'Copy Link' button next to the referral text box.",
+  "goals": "Copy full link to clipboard. Show a 'Copied!' tooltip indicator for 2 seconds. Ensure high accessibility.",
+  "template": "## 1. Interface Mockup & Elements\n## 2. Browser API Details\n## 3. Fallback Mechanism"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "template_3_db_migration",
+  "problem": "Database migrations occasionally cause query lockouts and downtime because there are no written runbooks.",
+  "solution": "Design a strict Database Migration Plan template requiring forward/backward compatibility checks.",
+  "goals": "Document rollback queries. Enforce lock-safe indexing syntax. Validate staging test migrations.",
+  "template": "## 1. Schema Change Details\n## 2. Migration Execution Commands\n## 3. Zero-Downtime Strategy (Expand/Contract)\n## 4. Rollback Scripts"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "small_1_dark_mode",
+  "problem": "Users complain about eye strain when using the dashboard at night.",
+  "solution": "Implement a client-side dark mode toggle in the header.",
+  "goals": "Allow users to toggle dark mode instantly. Persist preference across sessions. Align UI colors with accessible contrast guidelines.",
+  "template": "## 1. Feature Description\n## 2. UI/UX Behaviors\n## 3. Storage & State Management"
+}

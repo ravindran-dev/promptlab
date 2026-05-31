@@ -1,0 +1,7 @@
+{
+  "id": "template_4_sla_tracking",
+  "problem": "Customers drop off because performance issues go unmonitored until an outage occurs.",
+  "solution": "Establish an SLA tracking template defining availability metrics, latency bounds, and incident response times.",
+  "goals": "Define SLA boundaries (99.9% uptime). Outline response times based on severity levels. Schedule monthly reviews.",
+  "template": "## 1. Service Catalog & Scope\n## 2. SLO Thresholds (P95, P99 Latency)\n## 3. Incident Severity Definitions\n## 4. Refund / Credit Policies"
+}

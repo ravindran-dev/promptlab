@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: promptbench_db
+    environment:
+      POSTGRES_USER: promptuser
+      POSTGRES_PASSWORD: promptpass
+      POSTGRES_DB: promptbench
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U promptuser -d promptbench"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: promptbench_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: promptbench_backend
+    environment:
+      DATABASE_URL: postgresql://promptuser:promptpass@db:5432/promptbench
+      REDIS_URL: redis://redis:6379/0
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-mock-key-if-not-set}
+      GEMINI_MODEL: gemini-1.5-flash
+      JUDGE_MODEL: gemini-1.5-pro
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend/prompts:/app/backend/prompts
+
+  frontend:
+    build: ./frontend
+    container_name: promptbench_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

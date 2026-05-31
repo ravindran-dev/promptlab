@@ -1,0 +1,7 @@
+{
+  "id": "edge_3_payment_retry",
+  "problem": "Network hiccups during payment processing result in duplicate charges or silent, unlogged subscription cancellations.",
+  "solution": "Design an idempotent billing pipeline that retries failed transactions and runs webhook handlers safely.",
+  "goals": "Enforce Stripe idempotency keys. Queue failed payments for exponential backoff retries. Lock account access if retries fail after 3 days.",
+  "template": "## 1. Idempotency Key Architecture\n## 2. Retry Schedule & Billing Rules\n## 3. Webhook Failures Recovery Plan"
+}

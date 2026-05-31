@@ -1,0 +1,7 @@
+{
+  "id": "medium_2_user_profile",
+  "problem": "Users cannot update their biographical information, security settings, or preferences directly.",
+  "solution": "Create a unified Profile Settings page containing General Info, Security, and Notification tabs.",
+  "goals": "Allow updates to name, email, and password. Implement email validation. Provide tab-based navigation with unsaved changes warnings.",
+  "template": "## 1. Screen Layout & Tabs\n## 2. Form Validation Logic\n## 3. Backend Integration\n## 4. Security Checkpoints"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "large_5_oauth_sign_in",
+  "problem": "Friction during login leads to low signup rates. Users forget passwords and drop out.",
+  "solution": "Implement secure passwordless OAuth 2.0 authentication utilizing Google, GitHub, and email magic links.",
+  "goals": "Ensure single-click login. Auto-merge accounts with matching email addresses. Issue JWT tokens securely with CSRF checks.",
+  "template": "## 1. Authentication Handshakes\n## 2. Account Merge Rules\n## 3. JWT Schema & Cookie Policy\n## 4. Security Audit Considerations"
+}

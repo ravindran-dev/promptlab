@@ -1,0 +1,7 @@
+{
+  "id": "large_4_billing_portal",
+  "problem": "SaaS customers must email support manually to upgrade plans, cancel subscriptions, or download PDF invoices.",
+  "solution": "Integrate a comprehensive Stripe Customer Billing Portal for subscription tier modifications and card updates.",
+  "goals": "Show current tier and billing cycle. Allow seamless upgrade/downgrade with prorated charges. Display download links for historical invoices.",
+  "template": "## 1. Tier Pricing Matrix\n## 2. Stripe Webhook Handler Architecture\n## 3. Plan Change Logic & Entitlement Sync"
+}

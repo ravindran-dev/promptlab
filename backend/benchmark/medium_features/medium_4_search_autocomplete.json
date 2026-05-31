@@ -1,0 +1,7 @@
+{
+  "id": "medium_4_search_autocomplete",
+  "problem": "Users struggle to find relevant products because of spelling mistakes and slow search page loading.",
+  "solution": "Build an autocomplete search bar that displays matching products and category suggestions as the user types.",
+  "goals": "Trigger suggestions after 3 characters. Debounce keyboard inputs by 200ms. Support keyboard selection (arrow keys, Enter).",
+  "template": "## 1. UI States (Empty, Typing, Loading, Error)\n## 2. Debounce & Caching Logic\n## 3. API Performance SLAs"
+}

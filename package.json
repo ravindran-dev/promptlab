@@ -1,0 +1,21 @@
+{
+  "name": "productos-promptlab",
+  "version": "1.0.0",
+  "description": "Continuous prompt evaluation and benchmarking platform for Product Requirement Documents (PRDs).",
+  "main": "index.js",
+  "scripts": {
+    "benchmark": "python backend/run_benchmark.py",
+    "backend:start": "uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000",
+    "frontend:start": "npm --prefix frontend run dev",
+    "test": "pytest backend/tests/"
+  },
+  "keywords": [
+    "prompt-benchmarking",
+    "llm-as-a-judge",
+    "fastapi",
+    "react",
+    "langgraph"
+  ],
+  "author": "ProductOS",
+  "license": "MIT"
+}

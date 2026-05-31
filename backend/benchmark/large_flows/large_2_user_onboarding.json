@@ -1,0 +1,7 @@
+{
+  "id": "large_2_user_onboarding",
+  "problem": "New signups drop off immediately because the product is complex and lacks guided setup.",
+  "solution": "Implement an interactive, multi-step onboarding wizard that guides users through account setup, team invites, and first project creation.",
+  "goals": "Create interactive step guides. Allow skipping steps. Track completion progress. Send welcome emails automatically.",
+  "template": "## 1. Onboarding Funnel Steps\n## 2. UI Walkthrough Overlays\n## 3. Database Schema for User Progress\n## 4. Dropoff Analytics Triggers"
+}

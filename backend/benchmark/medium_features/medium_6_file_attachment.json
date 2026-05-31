@@ -1,0 +1,7 @@
+{
+  "id": "medium_6_file_attachment",
+  "problem": "Support agents receive tickets without visual context, causing long resolution times.",
+  "solution": "Build a file attachment component inside the support ticket creator supporting multiple image/log file uploads.",
+  "goals": "Limit upload to 5 files, 5MB each. Display loading progress bars. Support removal of attached files before submission.",
+  "template": "## 1. Attachment Specs\n## 2. API Payload Structure\n## 3. Storage Architecture (S3)"
+}

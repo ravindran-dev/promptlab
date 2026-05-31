@@ -1,0 +1,7 @@
+{
+  "id": "small_2_like_button",
+  "problem": "Users lack a quick way to express appreciation for posts, leading to low social engagement.",
+  "solution": "Add an interactive 'Like' button on every post card with micro-animations.",
+  "goals": "Ensure the button updates UI instantly (optimistic update). Track likes count accurately. Prevent double-liking.",
+  "template": "## 1. User Interaction Flow\n## 2. API Schema & Request/Response\n## 3. Edge Cases (Double click, offline)"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "edge_5_gdpr_deletion",
+  "problem": "Manual database scripting to delete user profiles takes hours and leads to compliance tracking issues.",
+  "solution": "Develop an automated Privacy Deletion Workflow ensuring full GDPR right-to-be-forgotten execution across main and secondary systems.",
+  "goals": "Delete personal data from main DB. Hard-delete or anonymize analytical data. Propagate deletion to email newsletters and backups.",
+  "template": "## 1. Deletion Execution Flow\n## 2. Anonymization Rules\n## 3. Verification Log & Status Updates"
+}

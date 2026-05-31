@@ -1,0 +1,7 @@
+{
+  "id": "medium_3_email_subscription",
+  "problem": "Users receive too many generic emails and unsubscribe completely due to lack of preferences control.",
+  "solution": "Implement a Subscription Preference Center with granular toggles for newsletters, updates, and promotions.",
+  "goals": "Provide checkbox controls. Allow single-click unsubscribe from all emails. Update marketing database in real-time.",
+  "template": "## 1. Feature Specifications\n## 2. Data Flow & Integration (ESP)\n## 3. Consent Logging Compliance"
+}

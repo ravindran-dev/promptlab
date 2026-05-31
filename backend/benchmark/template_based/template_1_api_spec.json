@@ -1,0 +1,7 @@
+{
+  "id": "template_1_api_spec",
+  "problem": "Integrating developers make mistakes because API parameters, schemas, and endpoints are not formal.",
+  "solution": "Create a unified, developer-facing API Specification document structure for all microservices.",
+  "goals": "Publish API standards. Enforce OpenAPI JSON specification structure. Group endpoints logically.",
+  "template": "## 1. API Metadata\n## 2. Authentication Protocol\n## 3. Endpoints & Methods\n## 4. JSON Error Payloads\n## 5. Client SDK Guidelines"
+}

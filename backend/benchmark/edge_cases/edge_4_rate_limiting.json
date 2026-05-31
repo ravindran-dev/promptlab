@@ -1,0 +1,7 @@
+{
+  "id": "edge_4_rate_limiting",
+  "problem": "Automated web scrapers overload API servers, degrading response times for actual paying customers.",
+  "solution": "Implement a distributed API rate limiting middleware using Redis token bucket mechanism.",
+  "goals": "Limit public endpoints to 60 requests/min and authenticated to 1000/min. Return HTTP 429 with Retry-After header. Support API key tier exceptions.",
+  "template": "## 1. Rate Limiting Rules & Tiers\n## 2. Redis Token Bucket Algorithm\n## 3. Header Specifications\n## 4. Bypass Protocols"
+}

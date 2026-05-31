@@ -1,0 +1,7 @@
+{
+  "id": "edge_2_concurrent_editing",
+  "problem": "Multiple team members edit the same project settings simultaneously, causing newer updates to overwrite older ones.",
+  "solution": "Implement optimistic locking with last-writer-wins warning indicators and document locking notifications.",
+  "goals": "Acquire lock when editing starts. Notify other viewers of the lock. Warn user if a save collision occurs.",
+  "template": "## 1. Lock Lifecycle & States\n## 2. API Request Lock/Release\n## 3. UI Warning Modals\n## 4. Database Transaction Control"
+}

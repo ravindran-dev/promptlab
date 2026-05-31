@@ -1,0 +1,7 @@
+{
+  "id": "template_5_partner_integration",
+  "problem": "Integrating with external fulfillment vendors takes weeks because integration steps are unstructured.",
+  "solution": "Write a standardized Integration Partner Onboarding guide detailing connection handshakes, webhook contracts, and sandbox testing.",
+  "goals": "Define webhook validation signatures. Describe sandbox configurations. Standardize API logs.",
+  "template": "## 1. Connection Requirements\n## 2. Authentication & Signatures\n## 3. Sandbox Testing Procedures\n## 4. Launch Checklist"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "edge_6_mfa_recovery",
+  "problem": "Users lose access to their authenticator apps, locking them out of accounts permanently.",
+  "solution": "Implement an MFA recovery process featuring backup codes and administrative identity verification overrides.",
+  "goals": "Generate 8-digit secure recovery codes on sign-up. Allow lock bypass using a recovery code once. Log recovery attempts.",
+  "template": "## 1. Recovery Code Specs\n## 2. Lockout Override Workflows\n## 3. Audit Logging Security"
+}

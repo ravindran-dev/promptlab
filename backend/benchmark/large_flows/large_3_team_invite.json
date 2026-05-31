@@ -1,0 +1,7 @@
+{
+  "id": "large_3_team_invite",
+  "problem": "Individual users cannot collaborate with coworkers, limiting viral product growth inside organizations.",
+  "solution": "Design a complete workspace member management and invitation flow with role-based access control.",
+  "goals": "Allow bulk email invites. Manage workspace roles (Owner, Admin, Editor, Viewer). Secure invite validation token logic.",
+  "template": "## 1. RBAC Matrix & Role Descriptions\n## 2. Invite Token Generation & Expiry\n## 3. UI Workspaces Panel\n## 4. Backend Validation APIs"
+}

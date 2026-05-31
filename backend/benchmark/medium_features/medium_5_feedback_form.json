@@ -1,0 +1,7 @@
+{
+  "id": "medium_5_feedback_form",
+  "problem": "Standard rating forms get low completion rates due to tedious questions and lack of progress tracking.",
+  "solution": "Create a multi-step rating form (Scale 1-10, Category Select, Written Feedback) with progress indicators.",
+  "goals": "Design a 3-step wizard. Save partial answers to prevent data loss. Show visual success state at the end.",
+  "template": "## 1. Wizard Structure\n## 2. Navigation Rules\n## 3. Analytics Tracking Events"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "medium_1_shopping_cart",
+  "problem": "Customers cannot save items for purchase, forcing them to buy items one-by-one.",
+  "solution": "Develop a persistent shopping cart service with quantity adjustments and summary calculations.",
+  "goals": "Maintain cart items in local state and sync to DB for logged-in users. Calculate taxes and discounts. Limit item quantity based on stock.",
+  "template": "## 1. Functional Requirements\n## 2. Database Model Draft\n## 3. API Routes & Cart Logic\n## 4. Checkout CTA Triggers"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "large_1_checkout_pipeline",
+  "problem": "High checkout abandonment rate due to complex pages, lack of guest checkout, and vague payment flows.",
+  "solution": "Design a structured, linear 3-step checkout flow: Shipping Info, Billing & Payment, and Order Review.",
+  "goals": "Support Guest Checkout. Verify shipping addresses using third-party APIs. Process credit cards via Stripe securely.",
+  "template": "## 1. Flow Diagram Description\n## 2. Detailed Checkout Steps\n## 3. Error Recovery & Card Validation\n## 4. API Endpoints and Payloads\n## 5. Security & PCI Compliance"
+}

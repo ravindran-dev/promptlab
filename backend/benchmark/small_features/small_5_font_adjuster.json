@@ -1,0 +1,7 @@
+{
+  "id": "small_5_font_adjuster",
+  "problem": "Visually impaired or elderly users struggle to read dense report text tables.",
+  "solution": "Provide a simple text-size adjustment widget (+ / A- / Reset) at the top of report views.",
+  "goals": "Scale typography dynamically between 12px and 24px. Save preference in local storage. Avoid breaking layout columns.",
+  "template": "## 1. Visual Layout\n## 2. Accessibility Guidelines (WCAG)\n## 3. State Management"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "template_2_security_audit",
+  "problem": "Security reviews are inconsistent, missing vital validation steps like CSRF, CORS, and secret leaks.",
+  "solution": "Implement a pre-deployment Security Compliance checklist template that all code releases must pass.",
+  "goals": "Establish vulnerability rating rules. Document sanitization policies. Standardize cryptography guidelines.",
+  "template": "## 1. Security Overview\n## 2. OWASP Top 10 Checklist\n## 3. Key Management & Secrets\n## 4. External Penetration Auditing"
+}
