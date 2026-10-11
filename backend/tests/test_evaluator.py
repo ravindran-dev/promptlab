@@ -1,5 +1,6 @@
 import json
 import os
+import pytest
 
 os.environ["GOOGLE_API_KEY"] = ""
 
@@ -31,7 +32,8 @@ class ScoringLLM:
         }))
 
 
-def test_judge_uses_generation_model_when_primary_judge_model_fails(monkeypatch):
+def test_judge_uses_only_configured_judge_model(monkeypatch):
+    monkeypatch.setattr(evaluator.settings, "LLM_PROVIDER", "gemini")
     monkeypatch.setattr(evaluator.settings, "JUDGE_MODEL", "gemini-2.5-pro")
     monkeypatch.setattr(evaluator.settings, "GEMINI_MODEL", "gemini-2.5-flash")
 
@@ -39,8 +41,6 @@ def test_judge_uses_generation_model_when_primary_judge_model_fails(monkeypatch)
 
     def fake_get_llm(model_name, **kwargs):
         requested_models.append(model_name)
-        if model_name == "gemini-2.5-pro":
-            return FailingLLM()
         return ScoringLLM()
 
     monkeypatch.setattr(evaluator, "get_llm", fake_get_llm)
@@ -53,25 +53,47 @@ def test_judge_uses_generation_model_when_primary_judge_model_fails(monkeypatch)
         prd="Generated PRD",
     )
 
-    assert requested_models == ["gemini-2.5-pro", "gemini-2.5-flash"]
+    assert requested_models == ["gemini-2.5-pro"]
     assert scores["coverage"] == 90.0
     assert scores["final_score"] == 72.5
     assert "Fallback judge model scored successfully" in scores["reasoning"]
 
 
-def test_judge_returns_fallback_only_after_all_models_fail(monkeypatch):
+def test_judge_raises_when_all_models_fail(monkeypatch):
+    monkeypatch.setattr(evaluator.settings, "LLM_PROVIDER", "gemini")
     monkeypatch.setattr(evaluator.settings, "JUDGE_MODEL", "gemini-2.5-pro")
     monkeypatch.setattr(evaluator.settings, "GEMINI_MODEL", "gemini-2.5-flash")
-    monkeypatch.setattr(evaluator, "get_llm", lambda model_name: FailingLLM())
+    monkeypatch.setattr(evaluator, "get_llm", lambda model_name, **kwargs: FailingLLM())
+    monkeypatch.setattr(evaluator, "invoke_with_retry", lambda llm, messages: llm.invoke(messages))
 
-    scores = evaluator.LLMJudge().evaluate(
-        problem="Problem",
-        solution="Solution",
-        goals="Goals",
-        template="## Template",
-        prd="Generated PRD",
-    )
+    with pytest.raises(RuntimeError) as exc_info:
+        evaluator.LLMJudge().evaluate(
+            problem="Problem",
+            solution="Solution",
+            goals="Goals",
+            template="## Template",
+            prd="Generated PRD",
+        )
 
-    assert scores["final_score"] == 50.0
-    assert "gemini-2.5-pro" in scores["reasoning"]
-    assert "gemini-2.5-flash" in scores["reasoning"]
+    message = str(exc_info.value)
+    assert "gemini-2.5-pro" in message
+    assert "gemini-2.5-flash" not in message
+
+
+def test_ollama_judge_uses_local_model_and_json(monkeypatch):
+    monkeypatch.setattr(evaluator.settings, "LLM_PROVIDER", "ollama")
+    monkeypatch.setattr(evaluator.settings, "OLLAMA_JUDGE_MODEL", "local-judge")
+    requested = []
+
+    def fake_get_llm(model_name, **kwargs):
+        requested.append((model_name, kwargs))
+        return ScoringLLM()
+
+    monkeypatch.setattr(evaluator, "get_llm", fake_get_llm)
+    scores = evaluator.LLMJudge().evaluate("Problem", "Solution", "Goals", "Template", "PRD")
+    assert scores["final_score"] == 72.5
+    assert requested == [("local-judge", {
+        "max_tokens": evaluator.settings.JUDGE_MAX_TOKENS,
+        "temperature": 0.0,
+        "response_mime_type": "application/json",
+    })]

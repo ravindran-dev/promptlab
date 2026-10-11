@@ -28,7 +28,7 @@ The primary goal is prompt experimentation, evaluation, benchmarking, and contin
         |                        |                        |
         v                        v                        v
 +---------------+        +---------------+        +---------------+
-|  PostgreSQL   |        |  Redis Cache  |        |  Gemini LLM   |
+|  PostgreSQL   |        |  Redis Cache  |        |  Ollama LLM   |
 | (Metric Logs) |        | (Leaderboards)|        | (Judge/Gen)   |
 +---------------+        +---------------+        +---------------+
 ```
@@ -36,7 +36,7 @@ The primary goal is prompt experimentation, evaluation, benchmarking, and contin
 ### LangGraph Node Workflow
 1. **Input Node**: Receives user inputs (`problem`, `solution`, `goals`, `template`, `prompt_version`).
 2. **Prompt Loader**: Retrieves active prompt content from Redis Cache, PostgreSQL, or Filesystem fallback.
-3. **PRD Generator**: Runs standard generation using Gemini (or Mock LLM fallback) and logs latency and token usage.
+3. **PRD Generator**: Runs local generation using Ollama and Qwen 3.5 and logs latency and token usage.
 4. **Evaluator**: Runs an LLM-as-a-Judge evaluation across 8 core metrics.
 5. **Metrics Collector**: Synthesizes and groups the generated text and execution metrics.
 6. **Database Writer**: Stores the compiled `MetricRun` in PostgreSQL.
@@ -58,19 +58,59 @@ The primary goal is prompt experimentation, evaluation, benchmarking, and contin
 ## Getting Started
 
 ### Prerequisites
-- Docker & Docker Compose installed.
-- (Optional) Google Gemini API Key set in environment.
+- Docker & Docker Compose for the database, cache, backend, and frontend.
+- [Ollama](https://ollama.com/download) running on your computer.
 
-### 1. Launch with Docker Compose
-To build and spin up the complete microservice architecture:
+Both PRD generation and judge scoring use the local `qwen3.5` model by default.
+[Qwen 3.5](https://ollama.com/library/qwen3.5) is an open-source model family.
+No hosted AI API key is required. Ollama must be running and the selected model
+must be downloaded; connection errors are reported instead of generating demo content.
+
+### 1. Download the model and configure the project
 
 ```bash
-# Set your API Key (Optional. If not set, system launches in Mock Mode)
-export GOOGLE_API_KEY="your-actual-api-key-here"
+ollama pull qwen3.5
+cp .env.example .env
+```
 
-# Spin up containers
+On PowerShell, use `Copy-Item .env.example .env`. If you already have a `.env`,
+keep your database settings and add the Ollama settings from `.env.example`.
+If `backend/.env` also exists, its values override the root `.env`; keep the
+Ollama settings consistent in both files.
+
+### 2. Launch with Docker Compose
+
+Keep the Ollama desktop app/server running, then:
+
+```bash
 docker compose up --build
 ```
+
+The backend container connects to the host Ollama server at
+`http://host.docker.internal:11434`. If the container cannot connect, configure
+Ollama to listen on `0.0.0.0:11434` using `OLLAMA_HOST` and restart Ollama.
+The Compose file includes a host-gateway mapping for Linux.
+
+### Local development
+
+With PostgreSQL and Redis running at the addresses in `.env`:
+
+```bash
+python -m pip install -r backend/requirements.txt
+npm --prefix frontend install
+npm run backend:start
+# In another terminal:
+npm run frontend:start
+```
+
+Local runs use `OLLAMA_BASE_URL=http://localhost:11434`.
+`OLLAMA_MODEL` controls generation and `OLLAMA_JUDGE_MODEL` controls scoring;
+pull each selected model before using it. `OLLAMA_MAX_TOKENS`,
+`JUDGE_MAX_TOKENS`, and `OLLAMA_TIMEOUT_SECONDS` control generation limits and
+timeouts. The API root reports the configured provider and models.
+
+Gemini remains an explicit opt-in for local runs: set `LLM_PROVIDER=gemini`,
+`GOOGLE_API_KEY`, `GEMINI_MODEL`, and `JUDGE_MODEL`. Docker Compose uses Ollama.
 
 Access the React dashboard at: **[http://localhost:5173](http://localhost:5173)**
 Access the backend API documentation at: **[http://localhost:8000/docs](http://localhost:8000/docs)**

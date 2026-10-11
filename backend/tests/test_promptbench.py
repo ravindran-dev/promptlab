@@ -1,6 +1,8 @@
 import os
 import sys
 import pytest
+import json
+from langchain_core.messages import AIMessage
 from fastapi.testclient import TestClient
 
 # Ensure backend directory is in path
@@ -9,7 +11,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Set env to use sqlite file-based db for testing to prevent pooling issues
 os.environ["DATABASE_URL"] = "sqlite:///test_promptbench.db"
 os.environ["REDIS_URL"] = "redis://mock" # Bypass Redis for unit tests
-os.environ["GOOGLE_API_KEY"] = "" # Force mock LLM mode
+os.environ["GOOGLE_API_KEY"] = ""
 
 from backend.app.main import app
 from backend.app.database import Base, engine, SessionLocal
@@ -17,6 +19,31 @@ from backend.app.models import BenchmarkCase, Prompt, MetricRun
 from backend.app.services.registry import PromptRegistry
 
 client = TestClient(app)
+
+@pytest.fixture(autouse=True)
+def local_llm(monkeypatch):
+    from backend.app.workflow import graph
+    from backend.app.services import evaluator
+
+    class TestLLM:
+        def __init__(self, json_output):
+            self.json_output = json_output
+
+        def invoke(self, messages):
+            if self.json_output:
+                return AIMessage(content=json.dumps({
+                    **{key: 80 for key in evaluator.LLMJudge.SCORE_KEYS},
+                    "reasoning": "Test judge response",
+                }))
+            return AIMessage(content="## 1. Description\nGenerated test PRD", usage_metadata={
+                "input_tokens": 20, "output_tokens": 10, "total_tokens": 30,
+            })
+
+    def fake_get_llm(model_name, **kwargs):
+        return TestLLM(kwargs.get("response_mime_type") == "application/json")
+
+    monkeypatch.setattr(graph, "get_llm", fake_get_llm)
+    monkeypatch.setattr(evaluator, "get_llm", fake_get_llm)
 
 @pytest.fixture(scope="module", autouse=True)
 def setup_test_db():
@@ -62,6 +89,12 @@ def test_root_endpoint():
     response = client.get("/")
     assert response.status_code == 200
     assert response.json()["status"] == "online"
+    from backend.app.config import settings
+    assert response.json()["provider"] == "ollama"
+    assert response.json()["models"] == {
+        "generator": settings.OLLAMA_MODEL,
+        "judge": settings.OLLAMA_JUDGE_MODEL,
+    }
 
 def test_list_prompts():
     response = client.get("/api/prompts")
@@ -91,7 +124,9 @@ def test_generate_prd():
     assert "prd" in data
     assert "tokens" in data
     assert "latency_ms" in data
-    assert data["model"] == "mock-model"
+    from backend.app.config import settings
+    assert data["model"] == settings.OLLAMA_MODEL
+    assert data["tokens"] == 30
     assert data["scores"] is not None
     assert data["scores"]["final_score"] > 0
 

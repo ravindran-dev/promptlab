@@ -3,9 +3,10 @@ import logging
 from typing import Dict, Any
 from langgraph.graph import StateGraph, END
 from langchain_core.runnables import RunnableConfig
+from langchain_core.messages import SystemMessage, HumanMessage
 from .state import PromptBenchState
 from ..services.registry import PromptRegistry, redis_client
-from ..services.llm import MockChatOpenAI, get_llm, is_mock_mode
+from ..services.llm import get_llm, invoke_with_retry
 from ..services.evaluator import LLMJudge
 from ..models import MetricRun, BenchmarkCase
 from ..config import settings
@@ -90,13 +91,18 @@ def prd_generator(state: PromptBenchState) -> Dict[str, Any]:
         injected_prompt = f"{prompt_content}\n\nInputs:\nProblem: {problem}\nSolution: {solution}\nGoals: {goals}\nTemplate: {template}"
 
     # Setup chat model
-    llm = get_llm(settings.GEMINI_MODEL, max_tokens=settings.GEMINI_MAX_TOKENS)
+    model_name = settings.generator_model
     
     start_time = time.time()
     
     # Track tokens and execute
     try:
-        response = llm.invoke(injected_prompt)
+        llm = get_llm(model_name, max_tokens=settings.generator_max_tokens)
+        messages = [
+            SystemMessage(content="Do not include chain-of-thought. Output only the PRD content."),
+            HumanMessage(content=injected_prompt),
+        ]
+        response = invoke_with_retry(llm, messages)
         
         # Standardize content to string format (Gemini often returns a list of dictionaries)
         prd_text = response.content
@@ -120,27 +126,11 @@ def prd_generator(state: PromptBenchState) -> Dict[str, Any]:
             "prd": prd_text,
             "tokens": tokens_used,
             "latency_ms": latency_ms,
-            "model": settings.GEMINI_MODEL if not is_mock_mode() else "mock-model"
+            "model": model_name
         }
     except Exception as e:
         logger.error(f"Error in prd_generator with configured provider: {e}")
-        logger.warning("Falling back to local mock PRD generator so the workflow can complete.")
-        try:
-            fallback_start = time.time()
-            response = MockChatOpenAI().invoke(injected_prompt)
-            prd_text = str(response.content)
-            fallback_tokens = (len(injected_prompt) + len(prd_text)) // 4
-            tokens_used = _extract_token_usage(response, fallback_tokens)
-            latency_ms = int((time.time() - fallback_start) * 1000)
-            return {
-                "prd": prd_text,
-                "tokens": tokens_used,
-                "latency_ms": latency_ms,
-                "model": "mock-model"
-            }
-        except Exception as fallback_error:
-            logger.error(f"Mock PRD generator fallback failed: {fallback_error}")
-            return {"error": f"PRD generation failed: {e}"}
+        return {"error": f"PRD generation failed: {e}"}
 
 # Node 4: Evaluator (Runs LLM-as-a-Judge)
 def evaluator(state: PromptBenchState) -> Dict[str, Any]:
@@ -155,8 +145,12 @@ def evaluator(state: PromptBenchState) -> Dict[str, Any]:
     prd = state["prd"]
     
     judge = LLMJudge()
-    scores = judge.evaluate(problem, solution, goals, template, prd)
-    
+    try:
+        scores = judge.evaluate(problem, solution, goals, template, prd)
+    except Exception as e:
+        logger.error(f"Error in evaluator with configured judge models: {e}")
+        return {"error": f"Judge evaluation failed: {e}"}
+
     return {
         "scores": scores,
         "final_score": scores.get("final_score", 0.0)

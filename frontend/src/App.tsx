@@ -195,42 +195,7 @@ export default function App() {
           setGeneratedPrd(`Error generating PRD. ${errorDetail}`);
         }
       } else {
-        // Frontend mock generation
-        setTimeout(() => {
-          setGeneratedPrd(`# Product Requirement Document (MOCK GENERATED)
-
-## 1. Product Overview
-This document specifies the notification system handling problem: "${problem}".
-
-## 2. Core Requirements
-- Support dispatch over Email and SMS.
-- Keep latency below 2 seconds (currently simulated).
-- Target Goals: ${goals}.
-
-## 3. UI Flow Mockup
-- Dashboard toggle preferences panel showing checkboxes.
-- Subscription status banners.
-
-*Note: Connect the FastAPI backend to generate actual AI-driven PRDs.*`);
-          setGenStats({
-            tokens: 1250,
-            latency_ms: 1450,
-            model: 'mock-model-gpt-4o',
-            scores: {
-              coverage: 85,
-              hallucination: 92,
-              design: 80,
-              engineering: 75,
-              qa: 70,
-              prototype: 80,
-              repetition: 95,
-              format: 90,
-              final_score: 82.5
-            }
-          });
-          setLoading(false);
-        }, 1500);
-        return;
+        setGeneratedPrd("Backend is offline. Start the FastAPI backend and Ollama to generate a PRD.");
       }
     } catch (e) {
       setGeneratedPrd(`Failed to connect to backend: ${e}`);

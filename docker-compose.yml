@@ -35,9 +35,16 @@ services:
     environment:
       DATABASE_URL: postgresql://promptuser:promptpass@db:5432/promptbench
       REDIS_URL: redis://redis:6379/0
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-mock-key-if-not-set}
-      GEMINI_MODEL: gemini-1.5-flash
-      JUDGE_MODEL: gemini-1.5-pro
+      LLM_PROVIDER: ollama
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3.5}
+      OLLAMA_JUDGE_MODEL: ${OLLAMA_JUDGE_MODEL:-qwen3.5}
+      OLLAMA_MAX_TOKENS: ${OLLAMA_MAX_TOKENS:-1800}
+      OLLAMA_TIMEOUT_SECONDS: ${OLLAMA_TIMEOUT_SECONDS:-120}
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-5m}
+      JUDGE_MAX_TOKENS: ${JUDGE_MAX_TOKENS:-800}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "8000:8000"
     depends_on:

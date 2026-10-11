@@ -72,8 +72,9 @@ def read_root():
     return {
         "status": "online",
         "service": "ProductOS PromptLab API Engine",
+        "provider": settings.provider,
         "models": {
-            "generator": settings.GEMINI_MODEL,
-            "judge": settings.JUDGE_MODEL
+            "generator": settings.generator_model,
+            "judge": settings.judge_model
         }
     }

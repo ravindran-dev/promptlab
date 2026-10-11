@@ -3,7 +3,7 @@ import re
 import logging
 from typing import Dict, Any, List
 from langchain_core.messages import SystemMessage, HumanMessage
-from .llm import get_llm
+from .llm import get_llm, invoke_with_retry
 from ..config import settings
 
 logger = logging.getLogger(__name__)
@@ -22,11 +22,7 @@ class LLMJudge:
 
     @staticmethod
     def _model_fallbacks() -> List[str]:
-        models: List[str] = []
-        for model_name in (settings.JUDGE_MODEL, settings.GEMINI_MODEL):
-            if model_name and model_name not in models:
-                models.append(model_name)
-        return models
+        return [settings.judge_model] if settings.judge_model else []
 
     def _get_llm(self, model_name: str) -> Any:
         if model_name not in self._llms:
@@ -77,6 +73,44 @@ class LLMJudge:
 
         raise ValueError("Judge response did not contain a valid JSON object.")
 
+    def _reformat_to_json(self, model_name: str, raw_content: str, *, strict: bool = False) -> Dict[str, Any]:
+        reformat_system_prompt = (
+            "You are a formatter. Return only valid JSON for the judge schema. "
+            "No prose, no markdown."
+        )
+        strict_note = "All keys are required. Use 0-100 numbers only." if strict else ""
+        reformat_user_content = f"""
+Convert this content into JSON that matches the required schema.
+{strict_note}
+
+Schema:
+{{
+  "coverage": 0,
+  "hallucination": 0,
+  "design": 0,
+  "engineering": 0,
+  "qa": 0,
+  "prototype": 0,
+  "repetition": 0,
+  "format": 0,
+  "reasoning": ""
+}}
+
+CONTENT:
+{raw_content}
+"""
+        messages = [
+            SystemMessage(content=reformat_system_prompt),
+            HumanMessage(content=reformat_user_content),
+        ]
+        response = invoke_with_retry(self._get_llm(model_name), messages)
+        reformatted = self._content_to_text(response.content)
+        return self._extract_json(reformatted)
+
+    @classmethod
+    def _missing_score_keys(cls, scores: Dict[str, Any]) -> List[str]:
+        return [key for key in cls.SCORE_KEYS if key not in scores]
+
     @classmethod
     def _extract_scores_fuzzy(cls, raw_content: str) -> Dict[str, Any]:
         scores: Dict[str, Any] = {}
@@ -112,6 +146,30 @@ class LLMJudge:
         normalized["reasoning"] = str(scores.get("reasoning", "")).strip()
         return normalized
 
+    @classmethod
+    def _fill_missing_scores(cls, scores: Dict[str, Any]) -> Dict[str, Any]:
+        completed = dict(scores)
+        numeric_values: List[float] = []
+        for key in cls.SCORE_KEYS:
+            try:
+                if key in completed:
+                    numeric_values.append(float(completed[key]))
+            except (TypeError, ValueError):
+                continue
+
+        fallback_value = 50.0
+        if numeric_values:
+            fallback_value = sum(numeric_values) / len(numeric_values)
+
+        for key in cls.SCORE_KEYS:
+            if key not in completed:
+                completed[key] = fallback_value
+
+        if not completed.get("reasoning"):
+            completed["reasoning"] = "Judge response missing some fields; scores inferred from available values."
+
+        return completed
+
     def evaluate(self, problem: str, solution: str, goals: str, template: str, prd: str) -> Dict[str, Any]:
         """
         Runs LLM-as-a-Judge evaluation on the generated PRD against original inputs and templates.
@@ -130,7 +188,7 @@ Metrics are 0-100:
 - repetition: avoids duplicate content
 - format: follows the requested markdown template
 
-Return raw JSON only. No prose before or after:
+Return raw JSON only. No prose before or after. Do not include chain-of-thought:
 {
   "coverage": 80.0,
   "hallucination": 95.0,
@@ -163,17 +221,36 @@ Return raw JSON only. No prose before or after:
         logger.info("Calling LLM Judge for evaluation...")
 
         errors: List[str] = []
+        if not self.model_names:
+            raise RuntimeError("Judge model is not configured. Set OLLAMA_JUDGE_MODEL for Ollama or JUDGE_MODEL for Gemini.")
         for model_name in self.model_names:
             try:
-                response = self._get_llm(model_name).invoke(messages)
+                response = invoke_with_retry(self._get_llm(model_name), messages)
                 raw_content = self._content_to_text(response.content)
 
                 try:
                     parsed = self._extract_json(raw_content)
                 except ValueError:
-                    parsed = self._extract_scores_fuzzy(raw_content)
-                    if not parsed:
-                        raise
+                    try:
+                        parsed = self._reformat_to_json(model_name, raw_content)
+                    except Exception:
+                        parsed = self._extract_scores_fuzzy(raw_content)
+
+                if not parsed:
+                    if settings.provider == "ollama":
+                        parsed = {
+                            "reasoning": "Judge response was not valid JSON; scores defaulted for Ollama output."
+                        }
+                    else:
+                        raise ValueError("Judge response did not contain a valid JSON object.")
+
+                missing = self._missing_score_keys(parsed)
+                if missing:
+                    try:
+                        parsed = self._reformat_to_json(model_name, raw_content, strict=True)
+                    except Exception:
+                        pass
+                    parsed = self._fill_missing_scores(parsed)
 
                 scores = self._normalize_scores(parsed)
 
@@ -200,16 +277,4 @@ Return raw JSON only. No prose before or after:
 
         joined_errors = " | ".join(errors) if errors else "No judge models configured."
         logger.error(f"Error executing LLM Judge: {joined_errors}")
-        # Return safe default fallback only after all configured judge models fail.
-        return {
-            "coverage": 50.0,
-            "hallucination": 50.0,
-            "design": 50.0,
-            "engineering": 50.0,
-            "qa": 50.0,
-            "prototype": 50.0,
-            "repetition": 50.0,
-            "format": 50.0,
-            "final_score": 50.0,
-            "reasoning": f"Judge failed with error(s): {joined_errors}. Fallback default scores returned."
-        }
+        raise RuntimeError(f"LLM Judge failed for all configured models: {joined_errors}")
